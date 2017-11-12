@@ -4,6 +4,7 @@ from collision_detection import *
 from sensors import *
 from pyglet.window import key
 from robot import *
+from robot_status import *
 class Window(pyglet.window.Window):
     def __init__(self, width=600, height=600, visible=True):
         """
@@ -24,16 +25,15 @@ class Window(pyglet.window.Window):
         self.robot_position = [400, 300]
 
         self.center_angle = 0
-        self.sensors = []
-        self.sensors.append(Sensors(sensor_coverage=180, num_rays=9, color=(0, 0, 255), sensor_range=60, center_angle=self.center_angle))
-        self.sensors.append(Sensors(sensor_coverage=110, num_rays=4, color=(255, 0, 0), sensor_range=60, center_angle=self.center_angle))
 
-        self.walls = []
-        self.robot = Robot()
+        self.env_objects = []
+        self.robots = []
 
         self.environment_objects = []
         if visible:
             pyglet.clock.schedule_interval(self.update, 1/120.0)
+
+        self.robot_status = RobotStatus()
 
     def add_objects_to_environment(self, object_instance):
         self.environment_objects.append(object_instance)
@@ -52,13 +52,13 @@ class Window(pyglet.window.Window):
                                             0, self.height,
                                             self.width, self.height)),
                                      ('c3B', (255, 255, 255) * 4))
-        for sensor_id, sensor in enumerate(self.sensors):
-            self.sensors[sensor_id].draw()
-        # Build walls
-        for wall_id, wall in enumerate(self.walls):
-            self.walls[wall_id].draw()
 
-        self.robot.draw()
+        # Build env_objects
+        for env_object_id, env_object in enumerate(self.env_objects):
+            self.env_objects[env_object_id].draw()
+
+        for robot_id, robot in enumerate(self.robots):
+            self.robots[robot_id].draw()
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.UP:
@@ -91,27 +91,42 @@ class Window(pyglet.window.Window):
             self.keys['rotate_right'] = False
 
     def update(self, dt):
-        # print (self.center_angle)
         step_size = 1
         if self.keys["up"]:
-            self.robot_position[1] += step_size * np.sin(np.deg2rad(self.center_angle))
-            self.robot_position[0] += step_size * np.cos(np.deg2rad(self.center_angle))
-
+            for i in range(len(self.robots)):
+                self.robots[i].robot_position[1] += step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
+                self.robots[i].robot_position[0] += step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
         elif self.keys["down"]:
-            self.robot_position[1] -= step_size * np.sin(np.deg2rad(self.center_angle))
-            self.robot_position[0] -= step_size * np.cos(np.deg2rad(self.center_angle))
+            for i in range(len(self.robots)):
+                self.robots[i].robot_position[1] -= step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
+                self.robots[i].robot_position[0] -= step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
 
         elif self.keys["left"]:
-            self.center_angle += 5
+            for i in range(len(self.robots)):
+                self.robots[i].center_angle += 5
         elif self.keys["right"]:
-            self.center_angle -= 5
+            for i in range(len(self.robots)):
+                self.robots[i].center_angle -= 5
 
-        for i in range(len(self.sensors)):
-            self.sensors[i].set_pos(self.robot_position)
-            self.sensors[i].set_center_angle(self.center_angle)
+        # Update robot position
+        for i in range(len(self.robots)):
+            self.robots[i].update_robot_pos()
 
-        for sensor_id, sensor in enumerate(self.sensors):
-            sensor_range_detection(sensor, self.walls)
+        # Perform collision detection
+        sensors_recording = []
+        if len(self.robots) > 0:
+            for i in range(len(self.robots)):
+                for sensor_id, sensor in enumerate(self.robots[i].sensors):
+                    sensors_recording += sensor_range_detection(sensor, self.env_objects)
 
-    def add_walls(self, wall_object):
-        self.walls.append(wall_object)
+                if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
+                    self.robot_status.robot_position = self.robots[i].robot_position
+                    self.robot_status.robot_rotation = self.robots[i].center_angle
+                    self.robot_status.robot_sensors_readings = sensors_recording
+            print (self.robot_status)
+
+    def add_env_objects(self, env_object_object):
+        self.env_objects.append(env_object_object)
+
+    def add_robot(self, robot_object):
+        self.robots.append(robot_object)
