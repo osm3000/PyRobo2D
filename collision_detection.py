@@ -2,6 +2,8 @@ from walls import *
 import math
 from sympy import *
 import numpy as np
+from robot import *
+
 def line(line_coordinates):
     X1, Y1, X2, Y2 = line_coordinates
     if X1 == X2:
@@ -59,8 +61,22 @@ def line_circle_intersection(circle_center, circle_radius, line_data):
     c_x, c_y = circle_center
     r = circle_radius
 
-    x, y = symbols('x y', real = True) # 'real' is to show only the real solutions
-    possible_solutions = solve([(x-c_x)**2 + (y-c_y)**2 - r**2, A*x + b - y], (x, y))
+    # TODO: Solving the equations using this sympy is super slow
+    # x, y = symbols('x y', real = True) # 'real' is to show only the real solutions
+    # possible_solutions = solve([(x-c_x)**2 + (y-c_y)**2 - r**2, A*x + b - y], (x, y))
+
+    # This is a direct solution, which is much faster
+    possible_solutions = [] # At maximum, there are two possible solutions
+    try: # Add the 1st solution
+        solution = ((-A*b + A*c_y + c_x - np.sqrt(-A**2*c_x**2 + A**2*r**2 - 2*A*b*c_x + 2*A*c_x*c_y - b**2 + 2*b*c_y - c_y**2 + r**2))/(A**2 + 1), (A**2*c_y + A*c_x - A*np.sqrt(-A**2*c_x**2 + A**2*r**2 - 2*A*b*c_x + 2*A*c_x*c_y - b**2 + 2*b*c_y - c_y**2 + r**2) + b)/(A**2 + 1))
+        possible_solutions.append(solution)
+    except:
+        pass
+    try: # Add the 2nd solution
+        solution = ((-A*b + A*c_y + c_x + sqrt(-A**2*c_x**2 + A**2*r**2 - 2*A*b*c_x + 2*A*c_x*c_y - b**2 + 2*b*c_y - c_y**2 + r**2))/(A**2 + 1), (A**2*c_y + A*c_x + A*sqrt(-A**2*c_x**2 + A**2*r**2 - 2*A*b*c_x + 2*A*c_x*c_y - b**2 + 2*b*c_y - c_y**2 + r**2) + b)/(A**2 + 1))
+        possible_solutions.append(solution)
+    except:
+        pass
     if len(possible_solutions) == 0: # No solution is found
         return False, -1
     else:
@@ -86,17 +102,22 @@ def sensor_range_detection(sensor, objects_list):
             continue
         for sensor_ray in range(len(sensor.current_sensor_rays)):
             sensor_line = line(sensor.current_sensor_rays[sensor_ray])
+
             if isinstance(objects_list[objects], Wall):
                 object_line = line(objects_list[objects].wall_coordinates)
                 interstection_detection, detection_range = line_line_intersection(sensor_line, object_line, sensor.current_sensor_rays[sensor_ray], objects_list[objects].wall_coordinates)
+
             elif isinstance(objects_list[objects], Robot) or isinstance(objects_list[objects], Ball):
-                interstection_detection, detection_range = line_circle_intersection()
+                interstection_detection, detection_range = line_circle_intersection(circle_center=objects_list[objects].ball_position, \
+                circle_radius=objects_list[objects].ball_radius, line_data=sensor.current_sensor_rays[sensor_ray])
+
             if interstection_detection:
                 if distances[sensor_ray] == -1:
                     distances[sensor_ray] = detection_range
                 elif distances[sensor_ray] > detection_range: # Report only the near object_line
                     distances[sensor_ray] = detection_range
-    print (distances)
+    # print (distances)
+    return distances
 
 # line_data = [10, 0, 0, -10]
 # line_data = [4, 4, -4, -4]
