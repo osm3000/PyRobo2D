@@ -19,6 +19,7 @@ like evolutionary algorithms and reinforcement learning.
     * The sensor can be randomly goes offline
     * The sensor can have false readings
 * [ ] Make a facility to record history for the robot readings. It will be useful later with reinforcement learning (for experience replay).
+* [ ] Create a special class for *maps*
 
 ## Questions:
 * Should the reading of the sensors be stored in the sensors instances? or in the robot instance? or just pass them directly to the robot status?
