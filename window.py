@@ -104,9 +104,21 @@ class Window(pyglet.window.Window):
         elif self.keys["left"]:
             for i in range(len(self.robots)):
                 self.robots[i].center_angle += 5
+
+                # Quick reset of the angle to the range of 0-360 --> Doesn't affect the performance
+                if self.robots[i].center_angle > 360:
+                    self.robots[i].center_angle -= 360
+                if self.robots[i].center_angle < 0:
+                    self.robots[i].center_angle += 360
         elif self.keys["right"]:
             for i in range(len(self.robots)):
                 self.robots[i].center_angle -= 5
+
+                # Quick reset of the angle to the range of 0-360 --> Doesn't affect the performance
+                if self.robots[i].center_angle > 360:
+                    self.robots[i].center_angle -= 360
+                if self.robots[i].center_angle < 0:
+                    self.robots[i].center_angle += 360
 
         # Update robot position
         for i in range(len(self.robots)):
@@ -120,9 +132,8 @@ class Window(pyglet.window.Window):
                     sensors_recording += sensor_range_detection(sensor, self.env_objects)
 
                 if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
-                    self.robot_status.robot_position = self.robots[i].robot_position
-                    self.robot_status.robot_rotation = self.robots[i].center_angle
-                    self.robot_status.robot_sensors_readings = sensors_recording
+                    self.robot_status(RobotPosition=self.robots[i].robot_position, RobotRotation = self.robots[i].center_angle,
+                    RobotSensorsReadings = sensors_recording)
             print (self.robot_status)
 
     def add_env_objects(self, env_object_object):
