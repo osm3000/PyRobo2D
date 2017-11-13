@@ -11,12 +11,7 @@ class Window(pyglet.window.Window):
         This is the class constructor
         """
         super(Window, self).__init__(width, height, visible=visible) #It takes the size of the window
-        self.init_square = (300, 300,
-                       300, 350,
-                       350, 300,
-                       350, 350)
-        self.position = dict(x1=300, y1=300, x2=300, y2=350, x3=350, y3=300,
-                             x4=350, y4=350)
+
         self.keys = dict(up=None, left=None, right=None, down=None, rotate_right=None, rotate_left=None)
 
         self.width = width
@@ -24,19 +19,13 @@ class Window(pyglet.window.Window):
 
         self.robot_position = [400, 300]
 
-        self.center_angle = 0
-
         self.env_objects = []
         self.robots = []
 
-        self.environment_objects = []
         if visible:
             pyglet.clock.schedule_interval(self.update, 1/120.0)
 
         self.robot_status = RobotStatus()
-
-    def add_objects_to_environment(self, object_instance):
-        self.environment_objects.append(object_instance)
 
     def on_draw(self):
         """
