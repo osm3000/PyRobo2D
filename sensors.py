@@ -14,6 +14,8 @@ class Sensors:
         self.current_sensor_rays = []
         self.sensor_ranges = [-1 for i in range(num_rays)]
 
+        self.collision_enabled = False
+
     def initialize_sensor_angles(self, center_angle, num_rays, sensor_coverage):
         return np.linspace(center_angle-0.5*sensor_coverage, center_angle+0.5*sensor_coverage, num_rays)
 
@@ -36,7 +38,7 @@ class Sensors:
             self.current_sensor_rays.append([self.sensor_pos[0], self.sensor_pos[1], x1, y1])
         return self.current_sensor_rays
     def draw(self):
-        self.current_sensor_rays = self.update_sensor_rays()
+        # self.current_sensor_rays = self.update_sensor_rays()
         for ray in self.current_sensor_rays:
             pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ('v2f', ray), ('c3B', self.color * 2) )
 
