@@ -18,7 +18,7 @@ like evolutionary algorithms and reinforcement learning.
 - [x] Test the circle-to-circle collision detection
 - [x] Prevent the robot from going passing environment objects (walls, balls)
 - [ ] Test for parallel instances
-- [ ] Make a facility to record history for the robot readings. It will be useful later with reinforcement learning (for experience replay).
+- [x] Make a facility to record history for the robot readings. It will be useful later with reinforcement learning (for experience replay).
 - [x] Subtract the sensor reading from the robot radius --> to correct the reading
 - [ ] Add 3 options for each object in the environment: visible, detectable and collidable
     - Visible means it will be drawn or not
@@ -29,11 +29,12 @@ like evolutionary algorithms and reinforcement learning.
     - Collidable means they prevent the robot from going further.
 - [ ] Rename the window class to be the environment class
 - [ ] Make the agent generic (it doesn't see the dictionary of actions, only the number of actions needed)
+- [ ] Add a small function that builds walls surrounding the window
+- [ ] Create a special class for *maps*
+- [x] Add a name for the class instance
 - [ ] Enable adding noise to the sensors
     - The sensor can be randomly goes offline
     - The sensor can have false readings
-- [ ] Add a small function that builds walls surrounding the window
-* [ ] Create a special class for *maps*
 
 ## Questions:
 * Should the reading of the sensors be stored in the sensors instances? or in the robot instance? or just pass them directly to the robot status?
