@@ -142,14 +142,14 @@ def collision_detection(source_object, object_list):
     """
     The goal here is to detect all possible
     """
-    intersection_vector = [False for i in range(len(object_list))]
+    intersection_dic    = {}
     for object_index, object_item in enumerate(object_list):
         if isinstance(source_object, Robot) and isinstance(object_item, Ball):
             interstection_detection, detection_range = circle_circle_intersection(circle_center0=object_item.circle_position, \
             circle_radius0=object_item.circle_radius, \
             circle_center1=source_object.circle_position_temp, \
             circle_radius1=source_object.circle_radius)
-            intersection_vector[object_index] = interstection_detection
+            intersection_dic[(source_object.properties["name"], object_item.properties["name"])] = interstection_detection
 
         elif isinstance(source_object, Robot) and isinstance(object_item, Wall):
             interstection_detection, detection_range = line_circle_intersection(\
@@ -158,11 +158,11 @@ def collision_detection(source_object, object_list):
             line_data=object_item.wall_coordinates, \
             print_data=False)
 
-            # print ("Intersection_detection: {}, detection_range: {}".format(interstection_detection, detection_range))
-            intersection_vector[object_index] = interstection_detection
+            intersection_dic[(source_object.properties["name"], object_item.properties["name"])] = interstection_detection
+
         else:
             raise("Undefined collision!")
-    return intersection_vector
+    return intersection_dic
 
 
 # line_data = [10, 0, 0, -10]
