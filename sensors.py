@@ -1,7 +1,7 @@
 import pyglet
 import numpy as np
 class Sensors:
-    def __init__(self, sensor_coverage=180, num_rays=9, color=(0, 0, 255), sensor_range=60, center_angle=0):
+    def __init__(self, sensor_coverage=180, num_rays=9, color=(0, 0, 255), sensor_range=60, center_angle=0, name=""):
         self.sensor_range = sensor_range
         self.sensor_coverage = sensor_coverage
         self.num_rays = num_rays
@@ -14,7 +14,11 @@ class Sensors:
         self.current_sensor_rays = []
         self.sensor_ranges = [-1 for i in range(num_rays)]
 
-        self.collision_enabled = False
+        self.properties = {}
+        self.properties['name']                 = name
+        self.properties['collision_enabled']    = False
+        self.properties['visible_enabled']      = True
+        self.properties['detectable_enabled']   = True
 
     def initialize_sensor_angles(self, center_angle, num_rays, sensor_coverage):
         return np.linspace(center_angle-0.5*sensor_coverage, center_angle+0.5*sensor_coverage, num_rays)
@@ -38,9 +42,9 @@ class Sensors:
             self.current_sensor_rays.append([self.sensor_pos[0], self.sensor_pos[1], x1, y1])
         return self.current_sensor_rays
     def draw(self):
-        # self.current_sensor_rays = self.update_sensor_rays()
-        for ray in self.current_sensor_rays:
-            pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ('v2f', ray), ('c3B', self.color * 2) )
+        if self.properties['visible_enabled']:
+            for ray in self.current_sensor_rays:
+                pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ('v2f', ray), ('c3B', self.color * 2) )
 
     def set_sensor_range(self, sensor_ranges):
         assert len(sensor_ranges) == self.num_rays

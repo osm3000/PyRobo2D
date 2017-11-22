@@ -11,7 +11,7 @@ def makeCircle(numPoints=200, color=(200, 100, 50), circle_center=(300, 200), ra
     return verts
 
 class Robot:
-    def __init__(self, circle_radius = 5, circle_position=[400, 300], color=(0, 0, 255), numPoints=200, center_angle=0):
+    def __init__(self, circle_radius = 5, circle_position=[400, 300], color=(0, 0, 255), numPoints=200, center_angle=0, name=""):
         self.circle_radius = circle_radius
         self.circle_position = circle_position[:]
         self.center_angle = center_angle
@@ -22,7 +22,11 @@ class Robot:
         self.numPoints = numPoints
 
         self.sensors = []
-        self.collision_enabled = True
+        self.properties = {}
+        self.properties['name']                 = name
+        self.properties['collision_enabled']    = True
+        self.properties['visible_enabled']      = True
+        self.properties['detectable_enabled']   = True
 
     def draw(self):
         circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.robot_verts),
@@ -37,15 +41,16 @@ class Robot:
         self.sensors.append(sensor_object)
 
     def update_robot_pos(self):
-        self.robot_verts = makeCircle(numPoints=self.numPoints, color=self.color, circle_center=self.circle_position, radius=self.circle_radius)
-        for i in range(len(self.sensors)):
-            self.sensors[i].set_pos(self.circle_position)
-            self.sensors[i].set_center_angle(self.center_angle)
-            self.sensors[i].update_sensor_rays()
+        if self.properties['visible_enabled']:
+            self.robot_verts = makeCircle(numPoints=self.numPoints, color=self.color, circle_center=self.circle_position, radius=self.circle_radius)
+            for i in range(len(self.sensors)):
+                self.sensors[i].set_pos(self.circle_position)
+                self.sensors[i].set_center_angle(self.center_angle)
+                self.sensors[i].update_sensor_rays()
 
 
 class Ball:
-    def __init__(self, circle_radius = 5, circle_position=[200, 200], color=(0, 0, 255), numPoints=200, center_angle=0):
+    def __init__(self, circle_radius = 5, circle_position=[200, 200], color=(0, 0, 255), numPoints=200, center_angle=0, name=""):
         self.circle_radius = circle_radius
         self.circle_position = circle_position
         self.color = color
@@ -53,13 +58,16 @@ class Ball:
         self.numPoints = numPoints
         self.center_angle = center_angle
 
-        self.collision_enabled = True
+        self.properties = {}
+        self.properties['name']                 = name
+        self.properties['collision_enabled']    = True
+        self.properties['visible_enabled']      = True
+        self.properties['detectable_enabled']   = True
 
     def draw(self):
-        circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.ball_verts),
-        ('c3B', self.color * self.numPoints))
-
-        circle_vertices.draw(pyglet.gl.GL_LINE_LOOP)
+        if self.properties['visible_enabled']:
+            circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.ball_verts), ('c3B', self.color * self.numPoints))
+            circle_vertices.draw(pyglet.gl.GL_LINE_LOOP)
 
     # def update_ball_pos(self, circle_position, center_angle):
     #     self.center_angle = center_angle
