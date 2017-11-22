@@ -12,12 +12,7 @@ class Window(pyglet.window.Window):
         This is the class constructor
         """
         super(Window, self).__init__(width, height, visible=visible) #It takes the size of the window
-        self.init_square = (300, 300,
-                       300, 350,
-                       350, 300,
-                       350, 350)
-        self.position = dict(x1=300, y1=300, x2=300, y2=350, x3=350, y3=300,
-                             x4=350, y4=350)
+
         self.keys = dict(up=None, left=None, right=None, down=None)
 
         self.width = width
@@ -89,32 +84,34 @@ class Window(pyglet.window.Window):
         # Read agent status
         if self.robot_agent != None: # If an agent is set, then override the keyboard
             self.keys = self.robot_agent.get_next_move()
-        # else:
-            # pass
-        # print ("self.keys : ", self.keys)
-        step_size = 1
+
+        step_size = 5
         if self.keys["up"]:
             for i in range(len(self.robots)):
                 self.robots[i].circle_position_temp[1] = self.robots[i].circle_position[1] + step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
                 self.robots[i].circle_position_temp[0] = self.robots[i].circle_position[0] + step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
 
-                collision_detection_list = collision_detection(self.robots[i], self.env_objects)
-                if True not in collision_detection_list: # Check if there is any collision
+                collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
+                if True not in list(collision_detection_dic.values()): # Check if there is any collision
                     self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
                     self.robots[i].circle_position[0] = self.robots[i].circle_position_temp[0]
+
+                print ("collision_detection_dic: ", collision_detection_dic)
         elif self.keys["down"]:
             for i in range(len(self.robots)):
                 self.robots[i].circle_position_temp[1] = self.robots[i].circle_position[1] - step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
                 self.robots[i].circle_position_temp[0] = self.robots[i].circle_position[0] - step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
 
-                collision_detection_list = collision_detection(self.robots[i], self.env_objects)
-                if True not in collision_detection_list: # Check if there is any collision
+                collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
+                if True not in list(collision_detection_dic.values()): # Check if there is any collision
                     self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
                     self.robots[i].circle_position[0] = self.robots[i].circle_position_temp[0]
 
+                print ("collision_detection_dic: ", collision_detection_dic)
         elif self.keys["left"]:
             for i in range(len(self.robots)):
                 self.robots[i].center_angle += 5
+
         elif self.keys["right"]:
             for i in range(len(self.robots)):
                 self.robots[i].center_angle -= 5
@@ -140,9 +137,9 @@ class Window(pyglet.window.Window):
                     if sensors_recording[j] != -1:
                         sensors_recording[j] -= self.robots[i].circle_radius
                 if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
-                    self.robot_status.robot_position = self.robots[i].circle_position
-                    self.robot_status.robot_rotation = self.robots[i].center_angle
-                    self.robot_status.robot_sensors_readings = sensors_recording
+                    self.robot_status.robot_position.append(self.robots[i].circle_position)
+                    self.robot_status.robot_rotation.append(self.robots[i].center_angle)
+                    self.robot_status.robot_sensors_readings.append(sensors_recording)
             print (self.robot_status)
 
     def add_env_objects(self, env_object_object):
