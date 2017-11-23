@@ -13,7 +13,7 @@ like evolutionary algorithms and reinforcement learning.
 - [x] Fix the keyboard agent (broken at the moment)
     - Instead of making a special keyboard agent, I will just add an option in the window class to either take the keys from the agent or
     from the keyboard. The problem is that I need an active window in order to detect the keys.
-- [ ] Add a good abstraction for the 'game logic': what is the task?
+- [x] Add a good abstraction for the 'game logic': what is the task?
     - This is the Finite State Machine of the game
     - It will depend a lot on the robot status message. It should not see inside the game engine
     - It will return a game over signal (to make an early shut down for the game) + a game score
@@ -40,6 +40,7 @@ like evolutionary algorithms and reinforcement learning.
 - [ ] Enable adding noise to the sensors
     - The sensor can be randomly goes offline
     - The sensor can have false readings
+- [ ] Integrate my NN into one of the agents and test it
 
 ## Questions:
 * Should the reading of the sensors be stored in the sensors instances? or in the robot instance? or just pass them directly to the robot status?
