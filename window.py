@@ -118,29 +118,28 @@ class Window(pyglet.window.Window):
 
         # Perform sensor_readings
         sensors_recording = []
-        if len(self.robots) > 0:
-            for i in range(len(self.robots)):
-                for sensor_id, sensor in enumerate(self.robots[i].sensors):
-                    sensors_recording += sensor_range_detection(sensor, self.env_objects)
+        for i in range(len(self.robots)):
+            sensors_recording = sensor_range_detection(self.robots[i], self.env_objects)
 
-                for j in range(len(sensors_recording)): # Remove the extra sensory reading
-                    if sensors_recording[j] != -1:
-                        sensors_recording[j] -= self.robots[i].circle_radius
-                if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
-                    self.robot_status.robot_position.append(self.robots[i].circle_position)
-                    self.robot_status.robot_rotation.append(self.robots[i].center_angle)
-                    self.robot_status.robot_sensors_readings.append(sensors_recording)
-                    self.robot_status.collisions.append(collision_detection_dic)
+            for j in range(len(sensors_recording)): # Remove the extra sensory reading --> What is that??? --> This is just to correct the extra reading
+            # resulting from the fact that the sensors are coming from the center of the robot
+                if sensors_recording[j] != -1:
+                    sensors_recording[j] -= self.robots[i].circle_radius
+            if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
+                self.robot_status.robot_position.append(self.robots[i].circle_position)
+                self.robot_status.robot_rotation.append(self.robots[i].center_angle)
+                self.robot_status.robot_sensors_readings.append(sensors_recording)
+                self.robot_status.collisions.append(collision_detection_dic)
 
-            # print (self.robot_status.get_robot_status())
+            print (self.robot_status.get_robot_status())
 
         # Update the game logic
         game_over, game_score = self.game_logic_instance.update_fsm(self.robot_status)
         self.robot_status.game_over = game_over
         self.robot_status.game_score = game_score
-        print ("Game FSM: ", self.game_logic_instance.game_fsm)
-        print ("Game Over: ", self.robot_status.game_over)
-        print ("Game Over: ", self.robot_status.game_score)
+        # print ("Game FSM: ", self.game_logic_instance.game_fsm)
+        # print ("Game Over: ", self.robot_status.game_over)
+        # print ("Game Over: ", self.robot_status.game_score)
 
     def add_env_objects(self, env_object_object):
         self.env_objects.append(env_object_object)

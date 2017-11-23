@@ -41,6 +41,8 @@ like evolutionary algorithms and reinforcement learning.
     - The sensor can be randomly goes offline
     - The sensor can have false readings
 - [ ] Integrate my NN into one of the agents and test it
+- [ ] Enable the removal of an object (a ball for example) during the game
+- [ ] Restructure the collision detection in a nicer way.
 
 ## Questions:
 * Should the reading of the sensors be stored in the sensors instances? or in the robot instance? or just pass them directly to the robot status?

@@ -22,9 +22,9 @@ def estimate_range(L1, L1_coord, Xa):
     distance = math.sqrt((X1 - Xa)**2 + (Y1 - Ya)**2)
     return distance
 
-def line_line_intersection(L1, L2, L1_coord, L2_coord):
-    A1, b1 = L1
-    A2, b2 = L2
+def line_line_intersection(L1_coord, L2_coord):
+    A1, b1 = line(L1_coord)
+    A2, b2 = line(L2_coord)
 
     X1, Y1, X2, Y2 = L1_coord
     X3, Y3, X4, Y4 = L2_coord
@@ -37,7 +37,7 @@ def line_line_intersection(L1, L2, L1_coord, L2_coord):
 
         if (Xa < max(X1, X2)) and (Xa > min(X1, X2)) and \
         (Xa < max(X3, X4)) and (Xa > min(X3, X4)):
-            distance = estimate_range(L1, L1_coord, Xa)
+            distance = estimate_range((A1, b1), L1_coord, Xa)
             return True, distance
         else:
             return False, -1
@@ -95,29 +95,28 @@ def line_circle_intersection(circle_center, circle_radius, line_data, print_data
         else:
             return True, distance
 
-def sensor_range_detection(sensor, objects_list):
-    distances = [-1 for i in range(len(sensor.current_sensor_rays))]
-    for objects in range(len(objects_list)):
-        if sensor.color !=  objects_list[objects].color:
-            continue
-        for sensor_ray in range(len(sensor.current_sensor_rays)):
-            sensor_line = line(sensor.current_sensor_rays[sensor_ray])
+def sensor_range_detection(robot, objects_list):
+    global_distances = []
+    for sensor_id, sensor in enumerate(robot.sensors):
+        distances = [-1 for i in range(len(sensor.current_sensor_rays))]
+        for objects in range(len(objects_list)):
+            if sensor.color ==  objects_list[objects].color:
+                for sensor_ray in range(len(sensor.current_sensor_rays)):
+                    if isinstance(objects_list[objects], Wall):
+                        interstection_detection, detection_range = line_line_intersection(sensor.current_sensor_rays[sensor_ray], \
+                        objects_list[objects].wall_coordinates)
 
-            if isinstance(objects_list[objects], Wall):
-                object_line = line(objects_list[objects].wall_coordinates)
-                interstection_detection, detection_range = line_line_intersection(sensor_line, object_line, \
-                sensor.current_sensor_rays[sensor_ray], objects_list[objects].wall_coordinates)
+                    elif isinstance(objects_list[objects], Robot) or isinstance(objects_list[objects], Ball):
+                        interstection_detection, detection_range = line_circle_intersection(circle_center=objects_list[objects].circle_position, \
+                        circle_radius=objects_list[objects].circle_radius, line_data=sensor.current_sensor_rays[sensor_ray])
 
-            elif isinstance(objects_list[objects], Robot) or isinstance(objects_list[objects], Ball):
-                interstection_detection, detection_range = line_circle_intersection(circle_center=objects_list[objects].circle_position, \
-                circle_radius=objects_list[objects].circle_radius, line_data=sensor.current_sensor_rays[sensor_ray])
-
-            if interstection_detection:
-                if distances[sensor_ray] == -1:
-                    distances[sensor_ray] = detection_range
-                elif distances[sensor_ray] > detection_range: # Report only the near object_line
-                    distances[sensor_ray] = detection_range
-    return distances
+                    if interstection_detection:
+                        if distances[sensor_ray] == -1:
+                            distances[sensor_ray] = detection_range
+                        elif distances[sensor_ray] > detection_range: # Report only the near object_line
+                            distances[sensor_ray] = detection_range
+        global_distances += distances
+    return global_distances
 
 def collision_detection(source_object, object_list):
     """
@@ -138,16 +137,8 @@ def collision_detection(source_object, object_list):
             circle_radius=source_object.circle_radius, \
             line_data=object_item.wall_coordinates, \
             print_data=False)
-
             intersection_dic[(source_object.properties["name"], object_item.properties["name"])] = interstection_detection
 
         else:
             raise("Undefined collision!")
     return intersection_dic
-
-
-# line_data = [10, 0, 0, -10]
-# line_data = [4, 4, -4, -4]
-# circle_center = [0, 0]
-# circle_radius = 1
-# print (line_circle_intersection(circle_center, circle_radius, line_data))
