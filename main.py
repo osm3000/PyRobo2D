@@ -16,6 +16,7 @@ if __name__ == "__main__":
     window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[0, 200, 300, 200], name="wall_2"))
     window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[300, 400, 300, 600], name="wall_3"))
     window.add_env_objects(Wall(color=(255, 0, 0), wall_coordinates=[100, 0, 100, 600], name="wall_4"))
-    # window.add_env_objects(robot.Ball(circle_radius=40, color=(255, 0, 0)))
+    window.add_env_objects(robot.Ball(circle_radius=20, color=(255, 0, 0), name="little_ball"))
+    window.add_env_objects(robot.Ball(circle_radius=40, color=(0, 0, 255), name="my_basket", circle_position=[500, 500]))
     window.add_robot(my_robot)
     pyglet.app.run()
