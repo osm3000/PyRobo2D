@@ -29,24 +29,24 @@ class Robot:
         self.properties['detectable_enabled']   = True
 
     def draw(self):
-        circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.robot_verts),
-        ('c3B', self.color * self.numPoints))
+        if self.properties['visible_enabled']:
+            circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.robot_verts),
+            ('c3B', self.color * self.numPoints))
 
-        circle_vertices.draw(pyglet.gl.GL_LINE_LOOP)
+            circle_vertices.draw(pyglet.gl.GL_LINE_LOOP)
 
-        for sensor_id, sensor in enumerate(self.sensors):
-            self.sensors[sensor_id].draw()
+            for sensor_id, sensor in enumerate(self.sensors):
+                self.sensors[sensor_id].draw()
 
     def add_sensors(self, sensor_object):
         self.sensors.append(sensor_object)
 
     def update_robot_pos(self):
-        if self.properties['visible_enabled']:
-            self.robot_verts = makeCircle(numPoints=self.numPoints, color=self.color, circle_center=self.circle_position, radius=self.circle_radius)
-            for i in range(len(self.sensors)):
-                self.sensors[i].set_pos(self.circle_position)
-                self.sensors[i].set_center_angle(self.center_angle)
-                self.sensors[i].update_sensor_rays()
+        self.robot_verts = makeCircle(numPoints=self.numPoints, color=self.color, circle_center=self.circle_position, radius=self.circle_radius)
+        for i in range(len(self.sensors)):
+            self.sensors[i].set_pos(self.circle_position)
+            self.sensors[i].set_center_angle(self.center_angle)
+            self.sensors[i].update_sensor_rays()
 
 
 class Ball:
