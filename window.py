@@ -6,6 +6,7 @@ from pyglet.window import key
 from robot import *
 from robot_status import *
 from agents import *
+from game_logic import *
 class Window(pyglet.window.Window):
     def __init__(self, width=600, height=600, visible=True):
         """
@@ -33,6 +34,7 @@ class Window(pyglet.window.Window):
 
         # self.robot_agent = AgentRandom()
         self.robot_agent = None
+        self.game_logic_instance = Collect_Ball_Simple()
 
     def add_objects_to_environment(self, object_instance):
         self.environment_objects.append(object_instance)
@@ -91,23 +93,11 @@ class Window(pyglet.window.Window):
                 self.robots[i].circle_position_temp[1] = self.robots[i].circle_position[1] + step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
                 self.robots[i].circle_position_temp[0] = self.robots[i].circle_position[0] + step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
 
-                collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
-                if True not in list(collision_detection_dic.values()): # Check if there is any collision
-                    self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
-                    self.robots[i].circle_position[0] = self.robots[i].circle_position_temp[0]
-
-                print ("collision_detection_dic: ", collision_detection_dic)
         elif self.keys["down"]:
             for i in range(len(self.robots)):
                 self.robots[i].circle_position_temp[1] = self.robots[i].circle_position[1] - step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
                 self.robots[i].circle_position_temp[0] = self.robots[i].circle_position[0] - step_size * np.cos(np.deg2rad(self.robots[i].center_angle))
 
-                collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
-                if True not in list(collision_detection_dic.values()): # Check if there is any collision
-                    self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
-                    self.robots[i].circle_position[0] = self.robots[i].circle_position_temp[0]
-
-                print ("collision_detection_dic: ", collision_detection_dic)
         elif self.keys["left"]:
             for i in range(len(self.robots)):
                 self.robots[i].center_angle += 5
@@ -116,16 +106,16 @@ class Window(pyglet.window.Window):
             for i in range(len(self.robots)):
                 self.robots[i].center_angle -= 5
 
+        for i in range(len(self.robots)):
+            collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
+            if True not in list(collision_detection_dic.values()): # Check if there is any collision
+                self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
+                self.robots[i].circle_position[0] = self.robots[i].circle_position_temp[0]
+
         # Update robot position
         for i in range(len(self.robots)):
             self.robots[i].update_robot_pos()
 
-        # Perform collision detection
-        # collision_detection_list = []
-        # if len(self.robots) > 0:
-        #     for robot_id, robot_item in enumerate(self.robots):
-        #         collision_detection_list = collision_detection(robot_item, self.env_objects)
-        # print ("collision_detection_list: ", collision_detection_list)
         # Perform sensor_readings
         sensors_recording = []
         if len(self.robots) > 0:
@@ -140,7 +130,17 @@ class Window(pyglet.window.Window):
                     self.robot_status.robot_position.append(self.robots[i].circle_position)
                     self.robot_status.robot_rotation.append(self.robots[i].center_angle)
                     self.robot_status.robot_sensors_readings.append(sensors_recording)
-            print (self.robot_status)
+                    self.robot_status.collisions.append(collision_detection_dic)
+
+            # print (self.robot_status.get_robot_status())
+
+        # Update the game logic
+        game_over, game_score = self.game_logic_instance.update_fsm(self.robot_status)
+        self.robot_status.game_over = game_over
+        self.robot_status.game_score = game_score
+        print ("Game FSM: ", self.game_logic_instance.game_fsm)
+        print ("Game Over: ", self.robot_status.game_over)
+        print ("Game Over: ", self.robot_status.game_score)
 
     def add_env_objects(self, env_object_object):
         self.env_objects.append(env_object_object)
