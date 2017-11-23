@@ -6,10 +6,6 @@ from robot import *
 
 def line(line_coordinates):
     X1, Y1, X2, Y2 = line_coordinates
-    # if X1 == X2:
-    #     X1 += 0.0001
-    # if Y1 == Y2:
-    #     Y1 += 0.0001
     try:
         A1 = (Y1-Y2)/(X1-X2) # Pay attention to not dividing by zero
     except:
@@ -32,16 +28,6 @@ def line_line_intersection(L1, L2, L1_coord, L2_coord):
 
     X1, Y1, X2, Y2 = L1_coord
     X3, Y3, X4, Y4 = L2_coord
-
-    # if X1 == X2:
-    #     X1 += 0.0001
-    # if X3 == X4:
-    #     X3 += 0.0001
-    #
-    # if Y1 == Y2:
-    #     Y1 += 0.0001
-    # if Y3 == Y4:
-    #     Y3 += 0.0001
 
     if A1 == A2: # The two line are parallel
         print ("Parallel Lines")
@@ -100,11 +86,6 @@ def line_circle_intersection(circle_center, circle_radius, line_data, print_data
         distance = float("inf")
         for solution in possible_solutions:
             Xa, Ya = float(solution[0]), float(solution[1])
-            # Xa = round(Xa, 3)
-            # X1 = round(X1, 3)
-            # X2 = round(X2, 3)
-            # Ya = round(Ya, 3)
-            # print ("X1: {}, X2: {}, X3: {}".format(X1, X2, Xa))
             if (Xa <= max(X1, X2)) and (Xa >= min(X1, X2)):
                 solution_distance = np.sqrt((X1 - Xa)**2 + (Y1 - Ya)**2)
                 if solution_distance < distance:
