@@ -48,7 +48,12 @@ class Robot:
             self.sensors[i].set_center_angle(self.center_angle)
             self.sensors[i].update_sensor_rays()
 
+    def make_invisible(self):
+        self.properties['visible_enabled']      = False
+        for i, _ in enumerate(self.sensors):
+            self.sensors[i].make_invisible()
 
+            
 class Ball:
     def __init__(self, circle_radius = 5, circle_position=[200, 200], color=(0, 0, 255), numPoints=200, center_angle=0, name=""):
         self.circle_radius = circle_radius
@@ -69,6 +74,8 @@ class Ball:
             circle_vertices = pyglet.graphics.vertex_list(self.numPoints, ('v2f', self.ball_verts), ('c3B', self.color * self.numPoints))
             circle_vertices.draw(pyglet.gl.GL_LINE_LOOP)
 
+    def make_invisible(self):
+        self.properties['visible_enabled']      = False
     # def update_ball_pos(self, circle_position, center_angle):
     #     self.center_angle = center_angle
     #     self.circle_position = circle_position
