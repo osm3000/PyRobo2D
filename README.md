@@ -25,7 +25,7 @@ like evolutionary algorithms and reinforcement learning.
 - [ ] Test for parallel instances
 - [x] Make a facility to record history for the robot readings. It will be useful later with reinforcement learning (for experience replay).
 - [x] Subtract the sensor reading from the robot radius --> to correct the reading
-- [ ] Add 3 options for each object in the environment: visible, detectable and collidable
+- [x] Add 3 options for each object in the environment: visible, detectable and collidable
     - Visible means it will be drawn or not --> DONE
         - Assume that I am working with invisible window (for simulation purposes), do I need to draw things in the canvas? Should I disable all
         drawing?
@@ -33,15 +33,16 @@ like evolutionary algorithms and reinforcement learning.
     - Detectable means sensors can detect it
     - Collidable means they prevent the robot from going further.
 - [ ] Rename the window class to be the environment class
-- [ ] Make the agent generic (it doesn't see the dictionary of actions, only the number of actions needed)
-- [ ] Add a small function that builds walls surrounding the window
+- [x] Make the agent generic (it doesn't see the dictionary of actions, only the number of actions needed)
+- [x] Add a small function that builds walls surrounding the window
+  - Will be done manually for now
 - [ ] Create a special class for *maps*
 - [x] Add a name for the class instance
 - [ ] Enable adding noise to the sensors
     - The sensor can be randomly goes offline
     - The sensor can have false readings
 - [ ] Integrate my NN into one of the agents and test it
-- [ ] Enable the removal of an object (a ball for example) during the game
+- [x] Enable the removal of an object (a ball for example) during the game
 - [ ] Restructure the collision detection in a nicer way.
 
 ## Questions:
