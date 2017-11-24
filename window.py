@@ -8,13 +8,14 @@ from robot_status import *
 from agents import *
 from game_logic import *
 class Window(pyglet.window.Window):
-    def __init__(self, width=600, height=600, visible=True):
+    def __init__(self, width=800, height=800, visible=True):
         """
         This is the class constructor
         """
         super(Window, self).__init__(width, height, visible=visible) #It takes the size of the window
 
         self.keys = dict(up=None, left=None, right=None, down=None)
+        self.possible_actions = list(self.keys.keys())
 
         self.width = width
         self.height = height
@@ -26,18 +27,15 @@ class Window(pyglet.window.Window):
         self.env_objects = []
         self.robots = []
 
-        self.environment_objects = []
         if visible:
             pyglet.clock.schedule_interval(self.update, 1/120.0)
 
         self.robot_status = RobotStatus()
 
-        # self.robot_agent = AgentRandom()
+        # self.robot_agent = AgentRandom(nb_actions=len(self.possible_actions))
         self.robot_agent = None
-        self.game_logic_instance = Collect_Ball_Simple()
-
-    def add_objects_to_environment(self, object_instance):
-        self.environment_objects.append(object_instance)
+        # self.game_logic_instance = Collect_Ball_Simple()
+        self.game_logic_instance = Collect_Ball_Full()
 
     def on_draw(self):
         """
@@ -82,12 +80,18 @@ class Window(pyglet.window.Window):
         elif symbol == key.DOWN:
             self.keys['down'] = False
 
+    def rest_keys(self):
+        for item in self.keys:
+            self.keys[item] = False
+
     def update(self, dt):
         # Read agent status
         if self.robot_agent != None: # If an agent is set, then override the keyboard
-            self.keys = self.robot_agent.get_next_move()
+            robot_action = self.robot_agent.get_next_move()
+            self.rest_keys()
+            self.keys[self.possible_actions[robot_action]] = True
 
-        step_size = 5
+        step_size = 1
         if self.keys["up"]:
             for i in range(len(self.robots)):
                 self.robots[i].circle_position_temp[1] = self.robots[i].circle_position[1] + step_size * np.sin(np.deg2rad(self.robots[i].center_angle))
@@ -117,7 +121,7 @@ class Window(pyglet.window.Window):
             self.robots[i].update_robot_pos()
 
         # Perform sensor_readings
-        sensors_recording = []
+        sensors_recording = None
         for i in range(len(self.robots)):
             sensors_recording = sensor_range_detection(self.robots[i], self.env_objects)
 
@@ -131,15 +135,27 @@ class Window(pyglet.window.Window):
                 self.robot_status.robot_sensors_readings.append(sensors_recording)
                 self.robot_status.collisions.append(collision_detection_dic)
 
-            print (self.robot_status.get_robot_status())
+        """
+        Update the game logic
+        """
+        game_over, game_score, env_changes = self.game_logic_instance.update_fsm(self.robot_status)
+        self.robot_status.ball_collect.append(self.game_logic_instance.game_fsm['ball_collected'])
 
-        # Update the game logic
-        game_over, game_score = self.game_logic_instance.update_fsm(self.robot_status)
         self.robot_status.game_over = game_over
         self.robot_status.game_score = game_score
         # print ("Game FSM: ", self.game_logic_instance.game_fsm)
         # print ("Game Over: ", self.robot_status.game_over)
-        # print ("Game Over: ", self.robot_status.game_score)
+        # print ("Game Score: ", self.robot_status.game_score)
+        try:
+            for item_to_remove in env_changes['remove']:
+                for env_object_id in range(len(self.env_objects)):
+                    if self.env_objects[env_object_id].properties['name'] == item_to_remove:
+                        self.env_objects[env_object_id].properties['visible_enabled'] = False
+                        self.env_objects[env_object_id].properties['collision_enabled'] = False
+                        self.env_objects[env_object_id].properties['detectable_enabled'] = False
+        except:
+            pass
+        print (self.robot_status)
 
     def add_env_objects(self, env_object_object):
         self.env_objects.append(env_object_object)
@@ -149,3 +165,9 @@ class Window(pyglet.window.Window):
 
     def set_agent(self, agent_object):
         self.robot_agent = robot_object
+
+    def make_invisible(self):
+        for i, _ in enumerate(self.robots):
+            self.robots[i].make_invisible()
+        for i, _ in enumerate(self.env_objects):
+            self.env_objects[i].make_invisible()
