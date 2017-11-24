@@ -48,3 +48,6 @@ class Sensors:
 
     def set_sensor_range(self, sensor_ranges):
         assert len(sensor_ranges) == self.num_rays
+
+    def make_invisible(self):
+        self.properties['visible_enabled']      = False
