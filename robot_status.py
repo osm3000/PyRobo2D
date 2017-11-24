@@ -6,6 +6,7 @@ class RobotStatus:
         self.robot_rotation = []
         self.robot_sensors_readings = []
         self.collisions = []
+        self.ball_collect = []
         self.game_over = False
         self.game_score = 0
 
@@ -15,6 +16,7 @@ class RobotStatus:
             self.properties['rotation']  = True
             self.properties['sensors']   = True
             self.properties['collision'] = False
+            self.properties['ball_flag'] = True
 
     def __str__(self):
         final_string = "History length: " + str(len(self.robot_rotation)) + "\n"
@@ -22,6 +24,7 @@ class RobotStatus:
         final_string += "Robot rotation: " + str(self.robot_rotation[-1]) + "\n"
         final_string += "Sensors: " + str(self.robot_sensors_readings[-1]) + "\n"
         final_string += "Collisions: " + str(self.collisions[-1]) + "\n"
+        final_string += "Ball Falg: " + str(self.ball_collect[-1]) + "\n"
         return final_string
 
     def get_robot_status(self):
@@ -32,5 +35,8 @@ class RobotStatus:
             robot_status_vector += [self.robot_rotation[-1]]
         if self.properties['sensors']:
             robot_status_vector += self.robot_sensors_readings[-1]
+        if self.properties['ball_flag']:
+            robot_status_vector += int(self.ball_collect[-1])
+
 
         return robot_status_vector
