@@ -20,3 +20,6 @@ class Wall:
     def draw(self):
         if self.properties['visible_enabled']:
             pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ('v2i', self.wall_coordinates), ('c3B', self.color * 2))
+
+    def make_invisible(self):
+        self.properties['visible_enabled']      = False
