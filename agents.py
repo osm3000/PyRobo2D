@@ -1,53 +1,27 @@
 from pyglet.window import key
 import numpy as np
+
 class AgentBase:
-    pass
+    def __init__(self, nb_actions):
+        self.nb_actions = nb_actions
+
+    def get_next_move(self, current_observation=None):
+        raise(NotImplemented)
 
 class AgentRandom(AgentBase):
-    def __init__(self):
-        super(AgentRandom, self).__init__()
+    def __init__(self, nb_actions):
+        super(AgentRandom, self).__init__(nb_actions)
         self.keys = dict(up=None, left=None, right=None, down=None)
 
-    def get_next_move(self):
-        random_key = np.random.randint(0, 3)
-        for key in self.keys:
-            self.keys[key] = False
+    def get_next_move(self, current_observation=None):
+        random_key = np.random.randint(0, 4)
 
-        if random_key == 0:
-            self.keys['up'] = True
-        elif random_key == 1:
-            self.keys['left'] = True
-        elif random_key == 2:
-            self.keys['right'] = True
-        elif random_key == 3:
-            self.keys['down'] = True
+        return random_key
 
-        return self.keys
-
-class AgentKeyBoard(AgentBase):
-    def __init__(self):
-        super(AgentKeyBoard, self).__init__()
+class AgentNN_Simple(AgentBase):
+    def __init__(self, nb_actions):
+        super(AgentNN_Simple, self).__init__(nb_actions)
         self.keys = dict(up=None, left=None, right=None, down=None)
 
-    def on_key_press(self, symbol, modifiers):
-        if symbol == key.UP:
-            self.keys['up'] = True
-        elif symbol == key.LEFT:
-            self.keys['left'] = True
-        elif symbol == key.RIGHT:
-            self.keys['right'] = True
-        elif symbol == key.DOWN:
-            self.keys['down'] = True
-
-    def on_key_release(self, symbol, modifiers):
-        if symbol == key.UP:
-            self.keys['up'] = False
-        elif symbol == key.LEFT:
-            self.keys['left'] = False
-        elif symbol == key.RIGHT:
-            self.keys['right'] = False
-        elif symbol == key.DOWN:
-            self.keys['down'] = False
-
-    def get_next_move(self):
+    def get_next_move(self, current_observation=None):
         return self.keys
