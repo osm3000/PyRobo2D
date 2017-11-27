@@ -7,6 +7,7 @@ from robot import *
 from robot_status import *
 from agents import *
 from game_logic import *
+from pyglet import clock
 class Window(pyglet.window.Window):
     def __init__(self, width=800, height=800, visible=True):
         """
@@ -26,9 +27,13 @@ class Window(pyglet.window.Window):
 
         self.env_objects = []
         self.robots = []
-
-        if visible:
+        if self.visible:
             pyglet.clock.schedule_interval(self.update, 1/120.0)
+        # else:
+        #     # pyglet.clock.schedule_interval(self.update, 0)
+        #     pyglet.clock.schedule(self.update)
+        #     # clock.schedule(self.update)
+            # pyglet.clock.schedule_interval(self.update, 1/120.0)
 
         self.robot_status = RobotStatus()
 
@@ -36,6 +41,7 @@ class Window(pyglet.window.Window):
         self.robot_agent = None
         # self.game_logic_instance = Collect_Ball_Simple()
         self.game_logic_instance = Collect_Ball_Full()
+        self.time_counter = 0
 
     def on_draw(self):
         """
@@ -87,9 +93,12 @@ class Window(pyglet.window.Window):
     def update(self, dt):
         # Read agent status
         if self.robot_agent != None: # If an agent is set, then override the keyboard
-            robot_action = self.robot_agent.get_next_move()
-            self.rest_keys()
-            self.keys[self.possible_actions[robot_action]] = True
+            if self.time_counter > 0:
+                robot_action = self.robot_agent.get_next_move(self.robot_status.get_robot_status())
+                self.rest_keys()
+                self.keys[self.possible_actions[robot_action]] = True
+            else:
+                self.rest_keys()
 
         step_size = 1
         if self.keys["up"]:
@@ -111,6 +120,12 @@ class Window(pyglet.window.Window):
                 self.robots[i].center_angle -= 5
 
         for i in range(len(self.robots)):
+            if self.robots[i].center_angle >= 360:
+                self.robots[i].center_angle -= 360
+            elif self.robots[i].center_angle < 0:
+                self.robots[i].center_angle += 360
+
+        for i in range(len(self.robots)):
             collision_detection_dic = collision_detection(self.robots[i], self.env_objects)
             if True not in list(collision_detection_dic.values()): # Check if there is any collision
                 self.robots[i].circle_position[1] = self.robots[i].circle_position_temp[1]
@@ -130,8 +145,8 @@ class Window(pyglet.window.Window):
                 if sensors_recording[j] != -1:
                     sensors_recording[j] -= self.robots[i].circle_radius
             if isinstance(self.robot_status, RobotStatus): # TODO: This is suitable for one robot right now
-                self.robot_status.robot_position.append(self.robots[i].circle_position)
-                self.robot_status.robot_rotation.append(self.robots[i].center_angle)
+                self.robot_status.robot_position.append([self.robots[i].circle_position[0]/self.width, self.robots[i].circle_position[1]/self.height])
+                self.robot_status.robot_rotation.append(self.robots[i].center_angle / 360)
                 self.robot_status.robot_sensors_readings.append(sensors_recording)
                 self.robot_status.collisions.append(collision_detection_dic)
 
@@ -143,9 +158,6 @@ class Window(pyglet.window.Window):
 
         self.robot_status.game_over = game_over
         self.robot_status.game_score = game_score
-        # print ("Game FSM: ", self.game_logic_instance.game_fsm)
-        # print ("Game Over: ", self.robot_status.game_over)
-        # print ("Game Score: ", self.robot_status.game_score)
         try:
             for item_to_remove in env_changes['remove']:
                 for env_object_id in range(len(self.env_objects)):
@@ -155,7 +167,18 @@ class Window(pyglet.window.Window):
                         self.env_objects[env_object_id].properties['detectable_enabled'] = False
         except:
             pass
-        print (self.robot_status)
+        # print (self.robot_status.get_robot_status())
+        # print (len(self.robot_status.get_robot_status()))
+
+        self.time_counter += 1
+        print (self.time_counter)
+
+        if game_over:
+             pyglet.app.exit()
+
+        # dt = clock.tick()
+        return game_over, game_score / self.time_counter
+
 
     def add_env_objects(self, env_object_object):
         self.env_objects.append(env_object_object)
@@ -164,10 +187,18 @@ class Window(pyglet.window.Window):
         self.robots.append(robot_object)
 
     def set_agent(self, agent_object):
-        self.robot_agent = robot_object
+        self.robot_agent = agent_object
 
     def make_invisible(self):
+        # self.visible = False
+        self.set_visible(visible=False)
         for i, _ in enumerate(self.robots):
             self.robots[i].make_invisible()
         for i, _ in enumerate(self.env_objects):
             self.env_objects[i].make_invisible()
+
+    def clean_env_objevts(self):
+        self.env_objects = []
+
+    def clean_robot(self):
+        self.robots = []
