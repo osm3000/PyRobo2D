@@ -29,6 +29,7 @@ class RobotStatus:
 
     def get_robot_status(self):
         robot_status_vector = []
+        # print ("self.ball_collect: ", self.ball_collect[-1])
         if self.properties['position']:
             robot_status_vector += self.robot_position[-1]
         if self.properties['rotation']:
@@ -36,7 +37,7 @@ class RobotStatus:
         if self.properties['sensors']:
             robot_status_vector += self.robot_sensors_readings[-1]
         if self.properties['ball_flag']:
-            robot_status_vector += int(self.ball_collect[-1])
-
+            # robot_status_vector += [self.ball_collect[-1]]
+            robot_status_vector += [int(self.ball_collect[-1])]
 
         return robot_status_vector
