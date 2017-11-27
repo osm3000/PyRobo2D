@@ -1,31 +1,38 @@
+"""
+This is an experimental main fn, in order to test the game
+"""
 import window
 from walls import *
 import robot
 from sensors import *
 from agents import *
-# def update(dt):
-#     window.update()
+import maps
+
 if __name__ == "__main__":
-    my_robot = robot.Robot(circle_radius=20, name="lovely_robot", color=(0, 0, 0))
-    my_robot.add_sensors(Sensors(sensor_coverage=180, num_rays=9, color=(0, 0, 255), sensor_range=60, center_angle=0, name="sensor_0"))
-    my_robot.add_sensors(Sensors(sensor_coverage=110, num_rays=4, color=(255, 0, 0), sensor_range=60, center_angle=0, name="sensor_1"))
+    print ("start.....")
+    width, height = 600, 600
+    window = window.Window(width=width, height=height, visible=False)
+    # window = window.Window(width=width, height=height)
 
-    width, heigth = 800, 800
-    window = window.Window(width=width, height=heigth)
-    window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, 1, 1, heigth-1], name="wall_1"))
-    window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, 1, width-1, 1], name="wall_2"))
-    window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[width-1, 1, width-1, heigth-1], name="wall_3"))
-    window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, heigth-1, width-1, heigth-1], name="wall_4"))
-
-    # window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, 1, 1, heigth-1], name="wall_8"))
-    # window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, 1, width-1, 1], name="wall_5"))
-    # window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[width-1, 1, width-1, heigth-1], name="wall_6"))
-    # window.add_env_objects(Wall(color=(0, 0, 255), wall_coordinates=[1, heigth-1, width-1, heigth-1], name="wall_7"))
-
-    # window.add_env_objects(robot.Ball(circle_radius=10, color=(255, 0, 0), name="ball_0", circle_position=[400, 400]))
-    # window.add_env_objects(robot.Ball(circle_radius=10, color=(255, 0, 0), name="ball_1", circle_position=[300, 300]))
-    # window.add_env_objects(robot.Ball(circle_radius=10, color=(255, 0, 0), name="ball_2", circle_position=[200, 200]))
-    # window.add_env_objects(robot.Ball(circle_radius=10, color=(255, 0, 0), name="ball_3", circle_position=[100, 100]))
-    # window.add_env_objects(robot.Ball(circle_radius=40, color=(0, 0, 255), name="basket", circle_position=[500, 500]))
+    my_robot, env_objects = maps.basic_collectball_map_static(width=width, height=height)
     window.add_robot(my_robot)
-    pyglet.app.run()
+    for item in env_objects:
+        window.add_env_objects(item)
+
+    window.set_agent(AgentRandom(3))
+    # window.set_agent(AgentNN_Simple(4))
+
+    window.make_invisible()
+    # pyglet.app.run()
+    clock_counter = 0
+    max_ticks = 2000
+    game_score = 0
+    game_over = None
+    while clock_counter < max_ticks:
+        print ("clock: ", clock_counter)
+        # window.on_draw()
+        game_over, game_score = window.update(0)
+        clock_counter += 1
+    print ("Game Over: {}, Game Score: {}".format(game_over, game_score))
+
+print ("GAME OVER")
