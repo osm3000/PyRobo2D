@@ -36,14 +36,28 @@ like evolutionary algorithms and reinforcement learning.
 - [x] Make the agent generic (it doesn't see the dictionary of actions, only the number of actions needed)
 - [x] Add a small function that builds walls surrounding the window
   - Will be done manually for now
-- [ ] Create a special class for *maps*
+- [x] Create a special class for *maps*
 - [x] Add a name for the class instance
 - [ ] Enable adding noise to the sensors
     - The sensor can be randomly goes offline
     - The sensor can have false readings
-- [ ] Integrate my NN into one of the agents and test it
+- [x] Integrate my NN into one of the agents and test it
 - [x] Enable the removal of an object (a ball for example) during the game
-- [ ] Restructure the collision detection in a nicer way.
+- [x] Restructure the collision detection in a nicer way.
+- [x] Normalize the robot status before giving it to the agent --> everything has to be between 0 and 1.
+- [ ] Integrate the optimizer with the NN agent
+    - Do this in the NN_plus_Extmem folder. Clone the PyRobo2D there.
+- [ ] Build a random map generator for the collect ball experiment
+    - This is important for developing robust controllers.
+- [ ] Create a UML/FlowChart diagram, describing the simulator
+    - This is important for maintenance, and for the next version of the simulator, since I don't feel the system is connected nicely.
+- [x] *Bypass pyglet event loop during learning*: all **pyglet** application has to start with pyglet.app.run command. This is limiting for me:
+    - It create problems when I want to parallelize several windows in the same time
+    - The update event has to be scheduled according to a clock. The issue is, there seems to be a limit on the clock speed the system can
+    handle, so i can't make the update speed faster above a certain threshold. This doesn't make any sense in learning mode, since i only care
+    about sequential logic updates, so i want it to work as fast as possible, with no regard for visualization.
+    - After checking the documentation of pyglet, it seems the pyglet.app.run is just a wrapper around a sequence of events (like read the
+        keyboard and mouse events, call the on_draw function, call update function, ...etc)
 
 ## Questions:
 * Should the reading of the sensors be stored in the sensors instances? or in the robot instance? or just pass them directly to the robot status?
